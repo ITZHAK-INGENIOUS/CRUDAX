@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Minimal permissions with clear purpose -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Used only for documentation links / optional network features. No data sent without consent. -->
+
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Runtime: automation finished, task failed, long-running scripts. -->
+
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Optional: scheduled automations that need boot awareness. Disabled by default. -->
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"
+        tools:targetApi="28" />
+    <!-- Only if a long automation service is started by the user. -->
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"
+        tools:targetApi="34" />
+
+    <!-- SYSTEM_ALERT_WINDOW is requested at runtime only when user enables floating controls. Never at install. -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
+    <!-- Package visibility queries (Android 11+) - only what we need -->
+    <queries>
+        <!-- Launcher / home -->
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.HOME" />
+        </intent>
+        <!-- Launch any app -->
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+        <!-- Termux -->
+        <package android:name="com.termux" />
+        <package android:name="com.termux.api" />
+        <package android:name="com.termux.gui" />
+        <intent>
+            <action android:name="com.termux.RUN_COMMAND" />
+        </intent>
+        <!-- File managers / document providers -->
+        <intent>
+            <action android:name="android.intent.action.OPEN_DOCUMENT" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.CREATE_DOCUMENT" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.GET_CONTENT" />
+        </intent>
+        <!-- Shizuku -->
+        <package android:name="moe.shizuku.privileged.api" />
+        <intent>
+            <action android:name="moe.shizuku.manager.action.REQUEST_PERMISSION" />
+        </intent>
+        <!-- Common file managers (optional detection) -->
+        <package android:name="com.lonelycatgames.Xplore" />
+        <package android:name="com.android.documentsui" />
+        <package android:name="com.google.android.apps.nbu.files" />
+    </queries>
+
+    <application
+        android:name=".CrudaxApp"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.CRUDAX"
+        tools:targetApi="34">
+
+        <!-- Main Launcher Activity -->
+        <activity
+            android:name=".ui.MainActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:stateNotNeeded="true"
+            android:theme="@style/Theme.CRUDAX"
+            android:windowSoftInputMode="adjustNothing"
+            android:configChanges="orientation|screenSize|keyboardHidden|uiMode">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.HOME" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Settings -->
+        <activity
+            android:name=".settings.SettingsActivity"
+            android:exported="false"
+            android:label="@string/settings"
+            android:parentActivityName=".ui.MainActivity" />
+
+        <!-- Diagnostics -->
+        <activity
+            android:name=".diagnostics.DiagnosticsActivity"
+            android:exported="false"
+            android:label="@string/diagnostics"
+            android:parentActivityName=".ui.MainActivity" />
+
+        <!-- Automation editor -->
+        <activity
+            android:name=".automation.AutomationEditorActivity"
+            android:exported="false"
+            android:label="@string/new_automation"
+            android:parentActivityName=".ui.MainActivity"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- Termux connection / diagnostic -->
+        <activity
+            android:name=".termux.TermuxConnectionActivity"
+            android:exported="false"
+            android:label="@string/termux_connection"
+            android:parentActivityName=".ui.MainActivity" />
+
+        <!-- Widget host configuration / bind result -->
+        <activity
+            android:name=".widgets.WidgetConfigureActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CRUDAX.Transparent" />
+
+        <!-- Onboarding -->
+        <activity
+            android:name=".ui.OnboardingActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CRUDAX" />
+
+        <!-- AppWidgetHost must be registered -->
+        <receiver
+            android:name=".widgets.CrudaxAppWidgetHost"
+            android:exported="false" />
+
+        <!-- Boot receiver - only registered if user enables boot automations -->
+        <receiver
+            android:name=".automation.BootReceiver"
+            android:exported="true"
+            android:enabled="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Notification channel helper service (optional) -->
+        <service
+            android:name=".notifications.CrudaxNotificationService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="automation_status" />
+        </service>
+
+    </application>
+</manifest>
