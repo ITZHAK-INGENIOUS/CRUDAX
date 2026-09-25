@@ -73,8 +73,10 @@ class DefaultAutomationManager(
         }
     }
 
-    override suspend fun delete(id: Long) = withContext(Dispatchers.IO) {
-        automations.removeAll { it.id == id }
+    override suspend fun delete(id: Long) {
+        withContext(Dispatchers.IO) {
+            automations.removeAll { it.id == id }
+        }
     }
 
     override suspend fun run(id: Long): ActionResult = withContext(Dispatchers.IO) {

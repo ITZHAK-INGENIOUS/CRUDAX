@@ -64,9 +64,11 @@ class DefaultWidgetManager(private val context: Context) : WidgetManager {
     // Persistence simplified: in-memory for MVP; Room can be wired later
     private val persisted = mutableListOf<WidgetItem>()
 
-    override suspend fun saveWidgets(items: List<WidgetItem>) = withContext(Dispatchers.IO) {
-        persisted.clear()
-        persisted.addAll(items)
+    override suspend fun saveWidgets(items: List<WidgetItem>) {
+        withContext(Dispatchers.IO) {
+            persisted.clear()
+            persisted.addAll(items)
+        }
     }
 
     override suspend fun loadWidgets(): List<WidgetItem> = withContext(Dispatchers.IO) {
